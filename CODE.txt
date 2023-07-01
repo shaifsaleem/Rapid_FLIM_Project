@@ -1,0 +1,95 @@
+Function for determining Mean and std.dev
+-----------------------------------------
+import numpy as np
+import pandas as pd
+import os
+def computation(polymer):
+    src_dir=os.path.join(f"D:/numpy_files/{polymer}/")
+    samples=os.listdir(src_dir)
+    list0=[]
+    list1=[]
+    list2=[]
+    list3=[]
+    list4=[]
+    for i in samples:    
+        polymer_name=i.split("_RF")[0]
+        img=np.load(src_dir+i)
+        ni=img[0:1,:,:]
+        nd= img[1:2,:,:]
+        mean_ni=np.mean(np.abs(ni))
+        std_dev_ni=np.std(ni)
+        mean_nd=np.mean(np.abs(nd))
+        std_dev_nd=np.std(nd)
+        list0.append(polymer_name)
+        list1.append(mean_ni)
+        list2.append(std_dev_ni)
+        list3.append(mean_nd)
+        list4.append(std_dev_nd)
+    col0= "polymer"
+    col1="mean(ni)"
+    col2="standard_deviation(ni)"
+    col3="mean(nd)"
+    col4="standard_deviation(nd)"
+    data=pd.DataFrame({col0:list0,col1:list1,col2:list2,col3:list3,col4:list4})
+    data.to_excel("sample.xlsx",sheet_name="sheet",index=False,header=True)
+    print('process complete')
+    
+polymer=input('Enter polymer name= ')
+computation(polymer)
+
+
+--------------------------------------
+Function for Normalizing N_I array
+--------------------------------------
+import numpy as np
+import os
+def normalize(polymer,exposure_time):
+    list=os.listdir(polymer)                 	
+    for i in list:                           		
+        img=np.load(polymer+i)
+        normalized_int=img[0,:,:]
+        int_diff= img[1,:,:]
+        updated=normalized_int*2000/int(exposure_time)
+        final_np=np.array([updated ,int_diff])
+        np.save(location+src_dir +'/'+i,final_np)     
+    print('Noramalization of {} has been completed'.format(src_dir))	
+s=input('Enter polymer and exposure time: ')  
+location ='D:/new_np/'                                            			
+src_dir=s.split(' ')[0]                                                			
+polymer = location+src_dir+'/'                                         
+exposure_time= s.split(' ')[1]                                          
+normalize(polymer,exposure_time) 
+
+    
+---------------------------------------------------
+For Grouping samples in accordance with Phase angle
+---------------------------------------------------
+import os
+import shutil
+phase_angle =['000','005','010','015','020','025','030','035','040','045','050','055','060','065','070','075','080',
+'085','090','095','100','105','110','115','120','125','130','135','140','145','150','155','160','165','170']
+for angle in phase_angle:
+    src_dir='D:/from1/'
+    target="D:/to/"
+    target_0= target + angle +'/'
+    polymers =['ABS','PA','PC','PVC','PE','SAN','POM','PET','PE-LD','PP','PS']
+    for i in polymers:
+        empty= []
+        src1= src_dir+ i+'/'
+        list =  os.listdir(src1)  
+        for j in list:
+            figure = j.split('_')[2][2:5] 
+            if figure in angle:
+                empty.append(j)
+        for f in empty:
+            shutil.move(src1+f,target_0+f )
+print('process finished')
+
+
+
+
+
+
+
+
+

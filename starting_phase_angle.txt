@@ -1,0 +1,30 @@
+from PIL import Image
+import numpy as np
+import cv2
+from matplotlib import pyplot as plt
+
+arr=np.load("E:\\Rapid-FLIM_Polymer2\\PVC\\PVC_M01_RF070.npy") 
+img=arr[1,:,:]
+laplacian = cv2.Laplacian(img,cv2.CV_64F)
+
+sobelx = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
+sobely = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
+
+kernelx = np.array([[1,1,1],[0,0,0],[-1,-1,-1]])
+kernely = np.array([[-1,0,1],[-1,0,1],[-1,0,1]])
+img_prewittx = cv2.filter2D(img, -1, kernelx)
+img_prewitty = cv2.filter2D(img, -1, kernely)
+add =img_prewittx + img_prewitty
+
+output = [img, laplacian, sobelx, sobely, img_prewittx, img_prewitty, add]
+titles = ['Original','Laplacian', 'sobelx', 'sobely','Prewitt X','Prewitt Y', 'Summing up Prewitt X & Y']
+for i in range(7):
+    fig = plt.figure(num=1, figsize=(7.33, 15))
+    ax1 = fig.add_subplot(4, 2, i + 1)
+    plt.imshow(output[i], cmap='jet')
+    plt.title(titles[i],fontsize=10)
+    plt.axis('on')
+    plt.colorbar(shrink=0.82,pad=0.05)
+    plt.xticks([])
+    plt.yticks([])
+plt.show()

@@ -1,0 +1,23 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import ndimage as ndi
+from skimage import feature
+
+image=np.load("E:\\Rapid-FLIM_Polymer2\\PU\\PU_M01_RF070.npy")
+image =image[1,:,:]
+
+image = ndi.gaussian_filter(image, 1)
+
+edges =[]
+
+for i in [0.25*i for i in range(1,16)]:
+    edges.append(feature.canny(image, sigma=i))
+
+fig, axes = plt.subplots(figsize=(15,12),nrows=3, ncols=5, sharex=True, sharey=True)
+
+for i in range(15):
+    axes.flat[i].imshow(edges[i],cmap=plt.cm.gray)
+    axes.flat[i].set_axis_off()
+    axes.flat[i].set_title("Sigma = {}".format(0.25*i),fontsize=16)
+fig.tight_layout()
+plt.show()
